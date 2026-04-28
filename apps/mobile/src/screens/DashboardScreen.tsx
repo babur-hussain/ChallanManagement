@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator, StatusBar, Image } from 'react-native';
+import { SvgXml } from 'react-native-svg';
+
+const RECEIPT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="#000000" d="M142 66.2C150.5 62.3 160.5 63.7 167.6 69.8L208 104.4L248.4 69.8C257.4 62.1 270.7 62.1 279.6 69.8L320 104.4L360.4 69.8C369.4 62.1 382.6 62.1 391.6 69.8L432 104.4L472.4 69.8C479.5 63.7 489.5 62.3 498 66.2C506.5 70.1 512 78.6 512 88L512 552C512 561.4 506.5 569.9 498 573.8C489.5 577.7 479.5 576.3 472.4 570.2L432 535.6L391.6 570.2C382.6 577.9 369.4 577.9 360.4 570.2L320 535.6L279.6 570.2C270.6 577.9 257.3 577.9 248.4 570.2L208 535.6L167.6 570.2C160.5 576.3 150.5 577.7 142 573.8C133.5 569.9 128 561.4 128 552L128 88C128 78.6 133.5 70.1 142 66.2zM232 200C218.7 200 208 210.7 208 224C208 237.3 218.7 248 232 248L408 248C421.3 248 432 237.3 432 224C432 210.7 421.3 200 408 200L232 200zM208 416C208 429.3 218.7 440 232 440L408 440C421.3 440 432 429.3 432 416C432 402.7 421.3 392 408 392L232 392C218.7 392 208 402.7 208 416zM232 296C218.7 296 208 306.7 208 320C208 333.3 218.7 344 232 344L408 344C421.3 344 432 333.3 432 320C432 306.7 421.3 296 408 296L232 296z"/></svg>`;
+const PURCHASE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free 7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="#000000" d="M256 144C256 108.7 284.7 80 320 80C355.3 80 384 108.7 384 144L384 192L256 192L256 144zM208 192L144 192C117.5 192 96 213.5 96 240L96 448C96 501 139 544 192 544L448 544C501 544 544 501 544 448L544 240C544 213.5 522.5 192 496 192L432 192L432 144C432 82.1 381.9 32 320 32C258.1 32 208 82.1 208 144L208 192zM232 240C245.3 240 256 250.7 256 264C256 277.3 245.3 288 232 288C218.7 288 208 277.3 208 264C208 250.7 218.7 240 232 240zM384 264C384 250.7 394.7 240 408 240C421.3 240 432 250.7 432 264C432 277.3 421.3 288 408 288C394.7 288 384 277.3 384 264z"/></svg>`;
 import { useDashboard } from '../hooks/api/useAnalytics';
 import { useAuthStore } from '../stores/authStore';
 import { colors, spacing, radius, typography, shadows } from '../lib/theme';
@@ -99,28 +103,43 @@ export function DashboardScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Create</Text>
             <View style={styles.createGrid}>
               {[
-                { name: 'Challan', icon: '📋', color: '#3b82f6', route: 'ChallanCreate' },
-                { name: 'Invoice', icon: '🧾', color: '#10b981', route: 'InvoiceCreate' },
-                { name: 'Receipt', icon: '💵', color: '#8b5cf6', route: 'AdvancedReceipt' },
-                { name: 'Ledger', icon: '📒', color: '#f59e0b', route: 'LedgerManagement' },
-                { name: 'Purchase', icon: '🛒', color: '#ec4899', route: 'PurchaseCreate' },
-                { name: 'Return', icon: '↩️', color: '#f43f5e', route: 'InvoiceList' },
-                { name: 'Order', icon: '📦', color: '#f97316', route: 'ChallanList' },
-                { name: 'Quote', icon: '📝', color: '#0ea5e9', route: 'QuotationList' },
-                { name: 'Payment', icon: '💳', color: '#6366f1', route: 'CreateVoucher' },
-                { name: 'Party', icon: '👥', color: '#14b8a6', route: 'PartyList' },
-                { name: 'Item', icon: '🧵', color: '#64748b', route: 'ItemList' },
-                { name: 'Pur. Ret', icon: '🔙', color: '#e11d48', route: 'Purchases' },
-              ].map(action => (
-                <TouchableOpacity
-                  key={action.name}
-                  style={[styles.createCard, { backgroundColor: action.color }]}
-                  onPress={() => navigation?.navigate?.(action.route as any)}
-                >
-                  <Text style={{ fontSize: 24, marginBottom: 4 }}>{action.icon}</Text>
-                  <Text style={styles.createText} numberOfLines={1}>{action.name}</Text>
-                </TouchableOpacity>
-              ))}
+                { name: 'Challan', image: require('../../assets/challan.png'), removedBackground: true, route: 'ChallanCreate' },
+                { name: 'Invoice', image: require('../../assets/bill.png'), removedBackground: true, route: 'InvoiceCreate' },
+                { name: 'Receipt', svgXml: RECEIPT_SVG, removedBackground: true, route: 'AdvancedReceipt' },
+                { name: 'Purchase', svgXml: PURCHASE_SVG, removedBackground: true, route: 'PurchaseCreate' },
+                { name: 'Sales Return', image: require('../../assets/return.png'), removedBackground: true, route: 'InvoiceList' },
+                { name: 'Order', image: require('../../assets/checklist.png'), removedBackground: true, route: 'ChallanList' },
+                { name: 'Quote', image: require('../../assets/quotation.png'), removedBackground: true, route: 'QuotationList' },
+                { name: 'Payment', image: require('../../assets/atm-card.png'), removedBackground: true, route: 'CreateVoucher' },
+                { name: 'Party', image: require('../../assets/user.png'), removedBackground: true, route: 'PartyList' },
+                { name: 'Item', image: require('../../assets/product.png'), removedBackground: true, route: 'ItemList' },
+                { name: 'Purchase Return', image: require('../../assets/purchase return.png'), removedBackground: true, route: 'Purchases' },
+                { name: 'DummyPlaceholder', invisible: true }
+              ].map((action: any, index: number) => {
+                if (action.invisible) {
+                  return <View key={`dummy-${index}`} style={[styles.createCard, { backgroundColor: 'transparent', elevation: 0, shadowOpacity: 0 }]} />;
+                }
+                return (
+                  <TouchableOpacity
+                    key={action.name}
+                    style={[
+                      styles.createCard,
+                      { backgroundColor: action.removedBackground ? 'transparent' : action.color },
+                      action.removedBackground && { elevation: 0, shadowOpacity: 0 }
+                    ]}
+                    onPress={() => navigation?.navigate?.(action.route)}
+                  >
+                    {action.svgXml ? (
+                      <View style={{ marginBottom: 4 }}><SvgXml xml={action.svgXml} width={30} height={30} /></View>
+                    ) : action.image ? (
+                      <Image source={action.image} style={{ width: 30, height: 30, marginBottom: 4 }} resizeMode="contain" />
+                    ) : (
+                      <Text style={{ fontSize: 24, marginBottom: 4 }}>{action.icon}</Text>
+                    )}
+                    <Text style={[styles.createText, action.removedBackground && { color: '#000000' }]} numberOfLines={2}>{action.name}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         )}

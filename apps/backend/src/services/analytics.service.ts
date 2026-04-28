@@ -8,14 +8,14 @@ import { Party } from '../models/Party.js';
 export class AnalyticsService {
   static async getDashboard(businessId: string | mongoose.Types.ObjectId) {
     const bId = typeof businessId === 'string' ? new mongoose.Types.ObjectId(businessId) : businessId;
-    
+
     const now = new Date();
-    
+
     // Today Boundaries
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     const startOfToday = new Date(endOfToday);
-    startOfToday.setHours(0,0,0,0);
-    
+    startOfToday.setHours(0, 0, 0, 0);
+
     // Yesterday Boundaries
     const startOfYesterday = new Date(startOfToday);
     startOfYesterday.setDate(startOfYesterday.getDate() - 1);
@@ -24,14 +24,14 @@ export class AnalyticsService {
 
     // This Month Boundaries
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
+
     // Last Month Boundaries
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-    
+
     // Last 6 Months Boundary
     const startOf6MonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-    
+
     // Last 12 Months Boundary
     const startOf12MonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
@@ -45,14 +45,14 @@ export class AnalyticsService {
       paymentsThisMonth,
       lowStockCount,
       activePartiesThisMonthCount,
-      
+
       topPartiesData,
       qualityMixData,
       dailyStatsThisWeek,
-      
+
       recentChallans,
       recentInvoices,
-      
+
       invoicePaymentHistory // Used for 6 month Rev/Coll chart
     ] = await Promise.all([
       // Challans Today
@@ -90,7 +90,7 @@ export class AnalyticsService {
       // Low Stock
       StockSummary.countDocuments({ businessId: bId, isLowStock: true }),
       // Active Parties This Month (Parties with a challan)
-      Challan.distinct('partyId', { businessId: bId, date: { $gte: startOfMonth, $lte: endOfToday }, status: { $ne: 'CANCELLED'} }),
+      Challan.distinct('partyId', { businessId: bId, date: { $gte: startOfMonth, $lte: endOfToday }, status: { $ne: 'CANCELLED' } }),
 
       // CHART 3: Top Parties (Current Month)
       Challan.aggregate([
@@ -114,27 +114,30 @@ export class AnalyticsService {
 
       // CHART 5: Daily Activity (Last 7 Days)
       Challan.aggregate([
-        { $match: { businessId: bId, date: { $gte: new Date(now.getTime() - 7*24*60*60*1000) } } },
-        { $group: { 
+        { $match: { businessId: bId, date: { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } } },
+        {
+          $group: {
             _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
             challansCreated: { $sum: { $cond: [{ $ne: ['$status', 'CANCELLED'] }, 1, 0] } },
             challansDelivered: { $sum: { $cond: [{ $in: ['$status', ['DELIVERED', 'BILLED']] }, 1, 0] } }
-        }},
+          }
+        },
         { $sort: { _id: 1 } }
       ]),
 
       // FEEDS
       Challan.find({ businessId: bId }).sort({ createdAt: -1 }).limit(10).populate('partyId', 'name').lean(),
       Invoice.find({ businessId: bId }).sort({ createdAt: -1 }).limit(5).lean(),
-      
+
       // History for Charts 1 & 2
       Invoice.aggregate([
         { $match: { businessId: bId, invoiceDate: { $gte: startOf6MonthsAgo }, status: 'ACTIVE' } },
-        { $group: { 
-            _id: { 
-              month: { $month: "$invoiceDate" }, 
-              year: { $year: "$invoiceDate" } 
-            }, 
+        {
+          $group: {
+            _id: {
+              month: { $month: "$invoiceDate" },
+              year: { $year: "$invoiceDate" }
+            },
             invoiced: { $sum: '$finalAmount' },
             collectedHere: { $sum: '$totalPaid' } // approximation for simplicity instead of nested unwind
           }
@@ -149,16 +152,16 @@ export class AnalyticsService {
       todayChallansMeters: challanStatsToday[0]?.meters || 0,
       todayChallansAmount: challanStatsToday[0]?.amount || 0,
       yesterdayChallansMeters: challanStatsYesterday[0]?.meters || 0,
-      
+
       thisMonthRevenue: invoiceStatsThisMonth[0]?.amount || 0,
       lastMonthRevenue: invoiceStatsLastMonth[0]?.amount || 0,
-      
+
       totalOutstanding: outstandingStats[0]?.amount || 0,
       monthlyRevenueForOutstandingThreshold: invoiceStatsThisMonth[0]?.amount || 0,
-      
+
       collectionsThisMonth: paymentsThisMonth[0]?.collected || 0,
       collectionRate: invoiceStatsThisMonth[0]?.amount > 0 ? ((paymentsThisMonth[0]?.collected || 0) / invoiceStatsThisMonth[0].amount) * 100 : 0,
-      
+
       lowStockItemsCount: lowStockCount,
       activePartiesThisMonth: activePartiesThisMonthCount.length
     };
@@ -174,7 +177,7 @@ export class AnalyticsService {
     // Format Rev/Collections Chart
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const revenueCollectionsChart = invoicePaymentHistory.map((d: any) => ({
-      month: `${monthNames[d._id.month - 1]} ${String(d._id.year).substr(2,2)}`,
+      month: `${monthNames[d._id.month - 1]} ${String(d._id.year).substr(2, 2)}`,
       invoiced: d.invoiced,
       collected: d.collectedHere
     }));
@@ -182,13 +185,13 @@ export class AnalyticsService {
     // Outstanding Aging - Real computation
     // 0-30, 31-60, 61-90, 90+
     const unpaidInvs = await Invoice.find({ businessId: bId, paymentStatus: { $ne: 'PAID' }, status: 'ACTIVE' }, 'dueDate balanceDue').lean();
-    
+
     let bucket30 = 0, bucket60 = 0, bucket90 = 0, bucket90Plus = 0;
     const nowTime = new Date().getTime();
     unpaidInvs.forEach((inv: any) => {
       const dueTime = new Date(inv.dueDate).getTime();
       const diffDays = Math.floor((nowTime - dueTime) / (1000 * 3600 * 24));
-      
+
       if (diffDays <= 30) bucket30 += inv.balanceDue;
       else if (diffDays <= 60) bucket60 += inv.balanceDue;
       else if (diffDays <= 90) bucket90 += inv.balanceDue;
@@ -207,7 +210,7 @@ export class AnalyticsService {
       ...recentChallans.map((c: any) => ({
         id: c._id,
         type: 'CHALLAN_' + c.status,
-        description: `Challan ${c.challanNumber} ${c.status === 'DELIVERED' ? 'delivered' : 'generated'}`,
+        description: `Challan ${c.challanNumber}${c.status === 'DELIVERED' ? ' delivered' : ''}`,
         partyName: c.partyId?.name || 'Unknown',
         amountInfo: `${c.totalMeters.toFixed(2)}m`,
         timestamp: c.createdAt
@@ -215,7 +218,7 @@ export class AnalyticsService {
       ...recentInvoices.map((inv: any) => ({
         id: inv._id,
         type: 'INVOICE',
-        description: `Invoice ${inv.invoiceNumber} generated`,
+        description: `Invoice ${inv.invoiceNumber}`,
         partyName: inv.partySnapshot.name,
         amountInfo: `₹${inv.finalAmount}`,
         timestamp: inv.createdAt
