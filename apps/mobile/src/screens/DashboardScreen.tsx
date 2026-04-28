@@ -109,7 +109,7 @@ export function DashboardScreen({ navigation }: any) {
                 { name: 'Purchase', svgXml: PURCHASE_SVG, removedBackground: true, route: 'PurchaseCreate' },
                 { name: 'Sales Return', image: require('../../assets/return.png'), removedBackground: true, route: 'InvoiceList' },
                 { name: 'Order', image: require('../../assets/checklist.png'), removedBackground: true, route: 'ChallanList' },
-                { name: 'Quote', image: require('../../assets/quotation.png'), removedBackground: true, route: 'QuotationList' },
+                { name: 'Quotation', image: require('../../assets/quotation.png'), removedBackground: true, route: 'QuotationList' },
                 { name: 'Payment', image: require('../../assets/atm-card.png'), removedBackground: true, route: 'CreateVoucher' },
                 { name: 'Party', image: require('../../assets/user.png'), removedBackground: true, route: 'PartyList' },
                 { name: 'Item', image: require('../../assets/product.png'), removedBackground: true, route: 'ItemList' },

@@ -77,11 +77,14 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
         <View style={{ alignItems: 'center' }}>
             <Text style={{ fontSize: 20 }}>{icons[label] || '📦'}</Text>
             <Text
+                numberOfLines={1}
                 style={{
                     fontSize: 10,
                     fontWeight: focused ? 'bold' : '400',
                     color: focused ? colors.primary : colors.textMuted,
                     marginTop: 2,
+                    textAlign: 'center',
+                    width: '100%'
                 }}
             >
                 {label}
