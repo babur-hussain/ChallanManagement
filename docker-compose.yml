@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # ─── MongoDB Replica Set ───────────────────────────────────────
+  mongo1:
+    image: mongo:7.0
+    container_name: textilepro-mongo1
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+    networks:
+      - textilepro-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mongo2:
+    image: mongo:7.0
+    container_name: textilepro-mongo2
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo2_data:/data/db
+    networks:
+      - textilepro-network
+    depends_on:
+      mongo1:
+        condition: service_healthy
+
+  mongo3:
+    image: mongo:7.0
+    container_name: textilepro-mongo3
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo3_data:/data/db
+    networks:
+      - textilepro-network
+    depends_on:
+      mongo1:
+        condition: service_healthy
+
+  # Initializes the replica set after all nodes are up
+  mongo-init:
+    image: mongo:7.0
+    container_name: textilepro-mongo-init
+    depends_on:
+      mongo1:
+        condition: service_healthy
+    networks:
+      - textilepro-network
+    restart: "no"
+    entrypoint: >
+      bash -c "
+        echo 'Waiting for MongoDB nodes...' &&
+        sleep 5 &&
+        mongosh --host mongo1:27017 --eval '
+          try {
+            rs.status();
+            print(\"Replica set already initialized\");
+          } catch(e) {
+            rs.initiate({
+              _id: \"rs0\",
+              members: [
+                { _id: 0, host: \"mongo1:27017\", priority: 2 },
+                { _id: 1, host: \"mongo2:27017\", priority: 1 },
+                { _id: 2, host: \"mongo3:27017\", priority: 1 }
+              ]
+            });
+            print(\"Replica set initiated successfully\");
+          }
+        '
+      "
+
+  # ─── Redis ────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: textilepro-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - textilepro-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── LocalStack (S3 Emulation) ────────────────────────────────
+  localstack:
+    image: localstack/localstack:latest
+    container_name: textilepro-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=0
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=ap-south-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+    networks:
+      - textilepro-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── MailHog (Email Capture) ───────────────────────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: textilepro-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - textilepro-network
+
+networks:
+  textilepro-network:
+    name: textilepro-network
+    driver: bridge
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:
+  redis_data:
+  localstack_data:

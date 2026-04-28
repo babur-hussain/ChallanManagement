@@ -1,0 +1,330 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   TextilePro Design System
+   Deep saffron #FF6B1A × Textile blue #1A5276
+   Tailwind CSS v4 + shadcn/ui CSS variables
+   ═══════════════════════════════════════════════════════════════ */
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Map CSS vars to Tailwind theme colors ─────────────────── */
+@theme inline {
+  --font-sans: "Inter", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
+  --font-hindi: "Noto Sans Devanagari", "Inter", sans-serif;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  /* Saffron brand palette */
+  --color-saffron-50: #FFF4EC;
+  --color-saffron-100: #FFE4CC;
+  --color-saffron-200: #FFC999;
+  --color-saffron-300: #FFAE66;
+  --color-saffron-400: #FF8C3A;
+  --color-saffron-500: #FF6B1A;
+  --color-saffron-600: #E55A0D;
+  --color-saffron-700: #B84400;
+  --color-saffron-800: #8A3300;
+  --color-saffron-900: #5C2200;
+
+  /* Textile blue palette */
+  --color-textile-50: #EBF5FF;
+  --color-textile-100: #CCE5F7;
+  --color-textile-200: #99CBEF;
+  --color-textile-300: #5CAAD9;
+  --color-textile-400: #2D87BF;
+  --color-textile-500: #1A5276;
+  --color-textile-600: #154363;
+  --color-textile-700: #103450;
+  --color-textile-800: #0B253D;
+  --color-textile-900: #061629;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Sidebar specific */
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+}
+
+/* ─── Light Mode (Deep Saffron Theme) ────────────────────────── */
+:root {
+  --background: 30 50% 98%;
+  --foreground: 20 14% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14% 12%;
+  --primary: 22 100% 55%;           /* #FF6B1A — Deep Saffron */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 204 65% 28%;         /* #1A5276 — Textile Blue */
+  --secondary-foreground: 0 0% 98%;
+  --muted: 30 20% 94%;
+  --muted-foreground: 20 10% 45%;
+  --accent: 22 95% 95%;
+  --accent-foreground: 22 100% 35%;
+  --destructive: 4 78% 57%;         /* #E74C3C */
+  --destructive-foreground: 0 0% 100%;
+  --success: 145 63% 42%;           /* #27AE60 */
+  --success-foreground: 0 0% 100%;
+  --warning: 37 90% 51%;            /* #F39C12 */
+  --warning-foreground: 20 14% 12%;
+  --border: 30 20% 88%;
+  --input: 30 20% 88%;
+  --ring: 22 100% 55%;
+  --radius: 0.625rem;
+
+  /* Sidebar */
+  --sidebar-background: 204 65% 28%;
+  --sidebar-foreground: 210 25% 90%;
+  --sidebar-primary: 22 100% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 204 50% 35%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 204 40% 38%;
+  --sidebar-ring: 22 100% 55%;
+
+  /* Chart colors */
+  --chart-1: 22 100% 55%;
+  --chart-2: 204 65% 40%;
+  --chart-3: 145 63% 42%;
+  --chart-4: 37 90% 51%;
+  --chart-5: 280 60% 55%;
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────── */
+.dark {
+  --background: 220 20% 8%;
+  --foreground: 30 15% 92%;
+  --card: 220 18% 12%;
+  --card-foreground: 30 15% 92%;
+  --popover: 220 18% 12%;
+  --popover-foreground: 30 15% 92%;
+  --primary: 22 100% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 204 45% 45%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 220 15% 18%;
+  --muted-foreground: 30 10% 60%;
+  --accent: 22 40% 18%;
+  --accent-foreground: 22 100% 70%;
+  --destructive: 4 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 145 55% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 37 80% 48%;
+  --warning-foreground: 0 0% 100%;
+  --border: 220 15% 22%;
+  --input: 220 15% 22%;
+  --ring: 22 100% 55%;
+
+  /* Sidebar dark */
+  --sidebar-background: 220 20% 6%;
+  --sidebar-foreground: 30 10% 80%;
+  --sidebar-primary: 22 100% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 15% 14%;
+  --sidebar-accent-foreground: 30 10% 88%;
+  --sidebar-border: 220 15% 16%;
+  --sidebar-ring: 22 100% 55%;
+
+  --chart-1: 22 90% 58%;
+  --chart-2: 204 55% 55%;
+  --chart-3: 145 50% 45%;
+  --chart-4: 37 80% 55%;
+  --chart-5: 280 55% 60%;
+}
+
+/* ─── Base Styles ────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Smooth transitions for dark mode toggle */
+  *,
+  *::before,
+  *::after {
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* ─── Global Layout Modifiers (Appearance Settings) ─── */
+  
+  [data-font-size="small"] {
+    --text-scale: 0.875;
+    font-size: 13px !important;
+  }
+  
+  [data-font-size="large"] {
+    --text-scale: 1.125;
+    font-size: 16px !important;
+  }
+
+  [data-table-density="compact"] th,
+  [data-table-density="compact"] td {
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  [data-table-density="spacious"] th,
+  [data-table-density="spacious"] td {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .compact-mode main {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .compact-mode .grid {
+    gap: 0.75rem !important;
+  }
+}
+
+/* ─── Utility Classes ────────────────────────────────────────── */
+@layer utilities {
+  /* Glassmorphism */
+  .glass {
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: hsl(var(--card) / 0.72);
+    border: 1px solid hsl(var(--border) / 0.4);
+  }
+
+  .glass-dark {
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: hsl(var(--card) / 0.6);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  /* Gradient backgrounds */
+  .gradient-saffron {
+    background: linear-gradient(135deg, #FF6B1A 0%, #FF8C3A 50%, #FFAE66 100%);
+  }
+
+  .gradient-textile {
+    background: linear-gradient(135deg, #1A5276 0%, #2D87BF 100%);
+  }
+
+  .gradient-premium {
+    background: linear-gradient(135deg, #FF6B1A 0%, #1A5276 100%);
+  }
+
+  /* Text gradient */
+  .text-gradient-saffron {
+    background: linear-gradient(135deg, #FF6B1A 0%, #E55A0D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Hindi text helper */
+  .font-hindi {
+    font-family: "Noto Sans Devanagari", "Inter", sans-serif;
+  }
+
+  /* Animation helpers */
+  .animate-slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+}
+
+/* ─── Keyframe Animations ────────────────────────────────────── */
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
